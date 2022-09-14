@@ -1,19 +1,19 @@
-﻿namespace EscapeRoom
+﻿using System;
+
+namespace EscapeRoom
 {
-    internal class Program
+    public class Program
     {
         static string[,] room;
 
-        static string walli = "|", wallj = "_", field = ".", player = "ß", finishDoor = "#", keyField = "?";
+        static string wall = "■", field = ".", player = "ß", finishDoor = "#", keyField = "?";
 
         static int playerPositionX = 3, playerPositionY = 5;    // Positionen des Players
         static int newPositionX = playerPositionX, newPositionY = playerPositionY;
         static string fieldCamefrom = ".";
         static string fieldGoto;
 
-        static int roomLengthX, roomLengthY;
-        static int doorPositionX, doorPositionY;
-        static int keyPositionX, keyPositionY;
+        static int roomLengthX, roomWithY;
 
         static bool movement = true;        // darf sich der Player bewegen? (Wand etc.)
         static bool key = false;            // hat der Player den Schlüssel?
@@ -25,12 +25,15 @@
 
         static void Main()
         {
+            RoomCreator Room1 = new RoomCreator();
+            Room1.SimpleOutput();
+
             Menu();
 
             if (!closeGame)
             {
                 Console.Clear();
-                RoomData();
+                RoomData();                 // Der SPieler gibt die Längen für den Raum ein
 
                 Console.Clear();
                 CreateChosenRoom();         // Room wird basierend auf den eingegebenen Daten erstellt
@@ -44,8 +47,11 @@
                 Main();
                 Console.Clear();
             }
-            
+
         }
+
+
+
 
         // --- Initialisierung des Rooms als 7x8 Feld
         static void CreateRoom7()
@@ -61,69 +67,111 @@
             room[playerPositionX, playerPositionY] = player;    // Startposition des Players
         }
 
-        // Der Spieler kann angeben, wie groß der Room sein soll
+
+        // Der Spieler soll angeben, wie groß der Room sein soll
         static void RoomData()
         {
             bool validLengthX = false, validLengthY = false;
 
             Console.WriteLine("Wähle nun die Größe deines Spielfeldes. \n" +
-                              "Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen 4 und 9");
+                              "Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen 4 und 12");
 
-            while (!validLengthY)
+            while (!validLengthY)   // zuerst soll der Y-Wert festgelegt werden
             {
-                Char roomLengthYinput = Console.ReadKey(true).KeyChar;      // Eingabe des Y-Wertes
-                roomLengthY = int.Parse(new string(roomLengthYinput, 1));   // und deren Umwandlung in ein int
+                string roomWithYinput = Console.ReadLine();           // Eingabe des Y-Wertes
 
-                if (roomLengthY >= 4 && roomLengthY <= 10)                  // Überprüfung, ob die eingegebene Zahl gültig ist
+                if (!int.TryParse(roomWithYinput, out roomWithY))   // Prüft, ob die Eingabe gültig war / eine Zahl ist
                 {
-                    validLengthY = true;
-
-                    Console.WriteLine("Breite: " + roomLengthY + "\n\n" +
-                                      "Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 4 und 9");
-
-                    while (!validLengthX)
-                    {
-                        Char roomLengthXinput = Console.ReadKey(true).KeyChar;      // Eingabe des X-Wertes
-                        roomLengthX = int.Parse(new string(roomLengthXinput, 1));   // und deren Umwandlung in ein int
-
-                        if (roomLengthX >= 4 && roomLengthX <= 10)           // Überprüfung, ob die eingegebene Zahl gültig ist    
-                        {
-                            validLengthX = true;
-
-                            Console.WriteLine("Länge: " + roomLengthX + "\n\n" +
-                                              "Drücke nun eine beliebige Taste, um das Spiel zu beginnen.");
-                            Console.ReadKey();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Diese Eingabe ist ungültig.");
-                        }
-                    }
+                    Console.WriteLine("Bitte gibe eine Zahl ein");
                 }
                 else
                 {
-                    Console.WriteLine("Diese Eingabe ist ungültig.");
+                    roomWithY = int.Parse(roomWithYinput);          // wandelt die eingegebene Zahl als string in int um
+
+                    if (roomWithY >= 4 && roomWithY <= 12)          // Prüft, ob die eingegebene Zahl im Bereich liegt
+                    {
+                        validLengthY = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Dieser Wert liegt nicht in dem vorgegebenen Bereich.");
+                    }
                 }
-            }     
+            }
+
+            Console.Clear();
+
+            Console.WriteLine("Breite: " + roomWithY + "\n\n" +
+                              "Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 4 und 15");
+
+            while (!validLengthX)   // nun soll der X-Wert festgelegt werden, in der gleichen Weise wie beim Y-Wert oben
+            {
+
+                string roomLengthXinput = Console.ReadLine();           // Eingabe des X-Wertes
+
+                if (!int.TryParse(roomLengthXinput, out roomLengthX))   // Prüft, ob die EIngabe gültig war / eine Zahl ist
+                {
+                    Console.WriteLine("Bitte gib eine Zahl ein");
+                }
+                else
+                {
+                    roomLengthX = int.Parse(roomLengthXinput);          // wandelt die eingegebene Zahl in int um
+
+                    if (roomLengthX >= 4 && roomLengthX <= 15)          // Prüft, ob die eingegebene Zahl im Bereich liegt    
+                    {
+                        validLengthX = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Dieser Wert liegt nicht in dem vorgegebenen Bereich.");
+                    }
+                }
+            }
+
+            Console.Clear();
+            Console.WriteLine($"Breite: {roomWithY} \nLänge: {roomLengthX} \n" +
+                              "Drücke nun eine beliebige Taste, um das Spiel zu beginnen");
+            Console.ReadKey();
         }
- 
+
+
+        // Der Raum wird nach dem Vorgaben des Spielers erstellt
         static void CreateChosenRoom()
         {
-            room = new string[roomLengthX, roomLengthY];
+            room = new string[roomLengthX, roomWithY];
+
+            Random random = new Random();
+
+            int keyX, keyY, playerX, playerY;
+
+            do
+            {
+                keyX = random.Next(1, roomWithY - 2);
+                keyY = random.Next(1, roomLengthX - 2);
+
+                playerX = random.Next(1, roomWithY - 2);
+                playerY = random.Next(1, roomLengthX - 2);
+            }
+            while (keyX == playerX && keyY == playerY);
+
 
             for (int i = 0; i < roomLengthX; i++)
             {
-                for (int j = 0; j < roomLengthY; j++)
+                for (int j = 0; j < roomWithY; j++)
                 {
                     room[i, j] = ".";
-                    
-                    if (i == 0 || i == roomLengthX - 1)
+
+                    if (i == 0 || i == roomLengthX - 1 || j == 0 || j == roomWithY - 1)
                     {
-                        room[i, j] = "_";
+                        room[i, j] = wall;
                     }
-                    if(j == 0 || j == roomLengthY - 1)
+                    if (i == keyX && j == keyY)
                     {
-                        room[i, j] = "|";
+                        // room[i, j] = keyX;
+                    }
+                    if (i == playerX && j == playerY)
+                    {
+                        room[i, j] = player;
                     }
                 }
             }
@@ -137,9 +185,9 @@
             movement = true;
 
             // Der Room wird ausgegeben
-            for (int i = 0; i < roomLengthY; i++)
+            for (int i = 0; i < roomLengthX; i++)
             {
-                for (int j = 0; j < roomLengthX; j++)             // !! i und j < room.length() ??
+                for (int j = 0; j < roomWithY; j++)             // !! i und j < room.length() ??
                 {
                     Console.Write(" " + room[i, j]);    // Room wird in der Konsole gezeichnet
                 }
@@ -186,7 +234,7 @@
             Console.Clear();
             Event();
 
-            if(movement) // wird nur ausgeführt, wenn sich der Player auf das angegebene Feld bewegen darf (keine Wand etc.)
+            if (movement) // wird nur ausgeführt, wenn sich der Player auf das angegebene Feld bewegen darf (keine Wand etc.)
             {
                 // Aktualisierung der Felder, wenn der Player läuft
                 fieldGoto = room[newPositionX, newPositionY];           // Feld wo ich hin will wird gespeichert
@@ -205,7 +253,7 @@
         // --- Events: wenn der Player auf/gegen ein spezielles Feld läuft
         static void Event()
         {
-            if (room[newPositionX, newPositionY] == walli || room[newPositionX, newPositionY] == wallj) // Wand
+            if (room[newPositionX, newPositionY] == wall) // Wand
             {
                 Console.WriteLine("Du läufst gegen eine Wand *aua*");
                 movement = false;
@@ -219,7 +267,7 @@
             }
             if (room[newPositionX, newPositionY] == finishDoor)     // finishDoor: Tür nach draussen
             {
-                if(key)
+                if (key)
                 {
                     Console.WriteLine("Vor dir befindet sich eine Tür, die nach draußen zu führen scheint. \n" +
                                       "Sie ist verschlossen, doch der Schlüssel, den du gefunden hast, scheint zu passen. \n" +
