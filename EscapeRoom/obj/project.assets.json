@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mjabs\\OneDrive\\Dokumente\\MyGames\\EscapeRoom\\EscapeRoom\\EscapeRoom.csproj",
+      "projectUniqueName": "C:\\Users\\mjabs\\OneDrive\\Dokumente\\GitHub\\EscapeRoom\\EscapeRoom\\EscapeRoom.csproj",
       "projectName": "EscapeRoom",
-      "projectPath": "C:\\Users\\mjabs\\OneDrive\\Dokumente\\MyGames\\EscapeRoom\\EscapeRoom\\EscapeRoom.csproj",
+      "projectPath": "C:\\Users\\mjabs\\OneDrive\\Dokumente\\GitHub\\EscapeRoom\\EscapeRoom\\EscapeRoom.csproj",
       "packagesPath": "C:\\Users\\mjabs\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mjabs\\OneDrive\\Dokumente\\MyGames\\EscapeRoom\\EscapeRoom\\obj\\",
+      "outputPath": "C:\\Users\\mjabs\\OneDrive\\Dokumente\\GitHub\\EscapeRoom\\EscapeRoom\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mjabs\\AppData\\Roaming\\NuGet\\NuGet.Config",
