@@ -8,8 +8,8 @@ namespace EscapeRoom
 
         static string wall = "■", field = ".", player = "ß", finishDoor = "#", keyField = "?";
 
-        static int playerPositionX = 3, playerPositionY = 5;    // Positionen des Players
-        static int newPositionX = playerPositionX, newPositionY = playerPositionY;
+        static int playerPositionX, playerPositionY;    // Positionen des Players
+        static int newPositionX, newPositionY;
         static string fieldCamefrom = ".";
         static string fieldGoto;
 
@@ -33,7 +33,7 @@ namespace EscapeRoom
             if (!closeGame)
             {
                 Console.Clear();
-                RoomData();                 // Der SPieler gibt die Längen für den Raum ein
+                RoomData();                 // Der Spieler gibt die Längen für den Raum ein
 
                 Console.Clear();
                 CreateChosenRoom();         // Room wird basierend auf den eingegebenen Daten erstellt
@@ -50,9 +50,7 @@ namespace EscapeRoom
 
         }
 
-
-
-
+        /*
         // --- Initialisierung des Rooms als 7x8 Feld
         static void CreateRoom7()
         {
@@ -66,7 +64,7 @@ namespace EscapeRoom
 
             room[playerPositionX, playerPositionY] = player;    // Startposition des Players
         }
-
+        */
 
         // Der Spieler soll angeben, wie groß der Room sein soll
         static void RoomData()
@@ -141,40 +139,50 @@ namespace EscapeRoom
             room = new string[roomLengthX, roomWithY];
 
             Random random = new Random();
+            int keyX, keyY, doorX, doorY;
 
-            int keyX, keyY, playerX, playerY;
-
-            do
-            {
-                keyX = random.Next(1, roomWithY - 2);
-                keyY = random.Next(1, roomLengthX - 2);
-
-                playerX = random.Next(1, roomWithY - 2);
-                playerY = random.Next(1, roomLengthX - 2);
-            }
-            while (keyX == playerX && keyY == playerY);
-
-
+            // Initialisierung des Rooms 
             for (int i = 0; i < roomLengthX; i++)
             {
                 for (int j = 0; j < roomWithY; j++)
                 {
-                    room[i, j] = ".";
+                    room[i, j] = field;                 // erstmal werden alle Felder initialisiert
 
                     if (i == 0 || i == roomLengthX - 1 || j == 0 || j == roomWithY - 1)
                     {
-                        room[i, j] = wall;
-                    }
-                    if (i == keyX && j == keyY)
-                    {
-                        // room[i, j] = keyX;
-                    }
-                    if (i == playerX && j == playerY)
-                    {
-                        room[i, j] = player;
+                        room[i, j] = wall;              // dann sollen alle Randfelder Wände sein
                     }
                 }
             }
+
+
+            do      // die Schleife stellt sicher, dass der Schlüssel und der Spieler nicht auf dem selben Feld spawnen
+            {
+                keyX = random.Next(1, roomWithY - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels...
+                keyY = random.Next(1, roomLengthX - 2);
+
+                playerPositionX = random.Next(1, roomWithY - 2);    // ... und für die Startposition des Spielers
+                playerPositionY = random.Next(1, roomLengthX - 2);
+            }
+            while (keyX == playerPositionX && keyY == playerPositionY);
+
+
+            do      // Die Tür soll in einer der Wände und nicht in den 4 Eckpunkten platziert werden
+            {
+                doorX = random.Next(roomWithY - 1);
+                doorY = random.Next(roomLengthX - 1);
+            }
+            while (room[doorX, doorY] != wall || (doorX == 0 && doorY == 0) || (doorX == roomWithY && doorY == 0) ||
+                  (doorX == 0 && doorY == roomLengthX) || (doorX == roomWithY && doorY == roomLengthX));
+
+
+            // Platzierung der Tür, des Schlüssels und des Spielers im Room
+            room[doorX, doorY] = finishDoor;
+            room[keyX, keyY] = keyField;
+            room[playerPositionX, playerPositionY] = player;
+
+            newPositionX = playerPositionX;
+            newPositionY = playerPositionY;
         }
 
 

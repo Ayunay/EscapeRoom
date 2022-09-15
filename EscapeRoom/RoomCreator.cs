@@ -13,7 +13,7 @@ namespace EscapeRoom
 
         public void SimpleOutput()
         {
-            Console.WriteLine($"{hight}");
+            Console.WriteLine();
         }
     }
 }
