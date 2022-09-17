@@ -11,9 +11,6 @@ namespace EscapeRoom
         static int playerPositionX, playerPositionY;    // Positionen des Players
         static int newPositionX, newPositionY;
         static string fieldCamefrom = ".";
-        static string fieldGoto;
-
-        static int roomLengthX, roomWithY;
 
         static bool movement = true;        // darf sich der Player bewegen? (Wand etc.)
         static bool key = false;            // hat der Player den Schlüssel?
@@ -50,29 +47,14 @@ namespace EscapeRoom
 
         }
 
-        /*
-        // --- Initialisierung des Rooms als 7x8 Feld
-        static void CreateRoom7()
-        {
-            room = new string[,] { { " ", "_", "_", "_", "_", "_", "_", " " },  // Erstellung des Rooms
-                                   { "|", ".", "?", ".", ".", ".", ".", "|" },
-                                   { "|", ".", ".", ".", ".", ".", ".", "|" },
-                                   { "|", ".", ".", ".", ".", ".", ".", "#" },
-                                   { "|", ".", ".", ".", ".", ".", ".", "|" },
-                                   { "|", ".", ".", ".", ".", ".", ".", "|" },
-                                   { "|", "_", "_", "_", "_", "_", "_", "|" } };
-
-            room[playerPositionX, playerPositionY] = player;    // Startposition des Players
-        }
-        */
-
         // Der Spieler soll angeben, wie groß der Room sein soll
         static void RoomData()
         {
+            int roomLengthX = 0, roomWithY = 0;
             bool validLengthX = false, validLengthY = false;
 
             Console.WriteLine("Wähle nun die Größe deines Spielfeldes. \n" +
-                              "Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen 4 und 12");
+                              "Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen 5 und 15");
 
             while (!validLengthY)   // zuerst soll der Y-Wert festgelegt werden
             {
@@ -80,13 +62,13 @@ namespace EscapeRoom
 
                 if (!int.TryParse(roomWithYinput, out roomWithY))   // Prüft, ob die Eingabe gültig war / eine Zahl ist
                 {
-                    Console.WriteLine("Bitte gibe eine Zahl ein");
+                    Console.WriteLine("Bitte gib eine Zahl ein");
                 }
                 else
                 {
                     roomWithY = int.Parse(roomWithYinput);          // wandelt die eingegebene Zahl als string in int um
 
-                    if (roomWithY >= 4 && roomWithY <= 12)          // Prüft, ob die eingegebene Zahl im Bereich liegt
+                    if (roomWithY >= 5 && roomWithY <= 15)          // Prüft, ob die eingegebene Zahl im Bereich liegt
                     {
                         validLengthY = true;
                     }
@@ -100,7 +82,7 @@ namespace EscapeRoom
             Console.Clear();
 
             Console.WriteLine("Breite: " + roomWithY + "\n\n" +
-                              "Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 4 und 15");
+                              "Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 5 und 20");
 
             while (!validLengthX)   // nun soll der X-Wert festgelegt werden, in der gleichen Weise wie beim Y-Wert oben
             {
@@ -115,7 +97,7 @@ namespace EscapeRoom
                 {
                     roomLengthX = int.Parse(roomLengthXinput);          // wandelt die eingegebene Zahl in int um
 
-                    if (roomLengthX >= 4 && roomLengthX <= 15)          // Prüft, ob die eingegebene Zahl im Bereich liegt    
+                    if (roomLengthX >= 5 && roomLengthX <= 20)          // Prüft, ob die eingegebene Zahl im Bereich liegt    
                     {
                         validLengthX = true;
                     }
@@ -126,29 +108,29 @@ namespace EscapeRoom
                 }
             }
 
+            room = new string[roomLengthX, roomWithY];
+
             Console.Clear();
             Console.WriteLine($"Breite: {roomWithY} \nLänge: {roomLengthX} \n" +
                               "Drücke nun eine beliebige Taste, um das Spiel zu beginnen");
-            Console.ReadKey();
+            Console.ReadKey();    
         }
 
 
         // Der Raum wird nach dem Vorgaben des Spielers erstellt
         static void CreateChosenRoom()
         {
-            room = new string[roomLengthX, roomWithY];
-
             Random random = new Random();
             int keyX, keyY, doorX, doorY;
 
             // Initialisierung des Rooms 
-            for (int i = 0; i < roomLengthX; i++)
+            for (int i = 0; i < room.GetLength(0); i++)
             {
-                for (int j = 0; j < roomWithY; j++)
+                for (int j = 0; j < room.GetLength(1); j++)
                 {
                     room[i, j] = field;                 // erstmal werden alle Felder initialisiert
 
-                    if (i == 0 || i == roomLengthX - 1 || j == 0 || j == roomWithY - 1)
+                    if (i == 0 || i == room.GetLength(0) - 1 || j == 0 || j == room.GetLength(1) - 1)
                     {
                         room[i, j] = wall;              // dann sollen alle Randfelder Wände sein
                     }
@@ -158,22 +140,22 @@ namespace EscapeRoom
 
             do      // die Schleife stellt sicher, dass der Schlüssel und der Spieler nicht auf dem selben Feld spawnen
             {
-                keyX = random.Next(1, roomWithY - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels...
-                keyY = random.Next(1, roomLengthX - 2);
+                keyX = random.Next(1, room.GetLength(0) - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels...
+                keyY = random.Next(1, room.GetLength(1) - 2);
 
-                playerPositionX = random.Next(1, roomWithY - 2);    // ... und für die Startposition des Spielers
-                playerPositionY = random.Next(1, roomLengthX - 2);
+                playerPositionX = random.Next(1, room.GetLength(0) - 2);    // ... und für die Startposition des Spielers
+                playerPositionY = random.Next(1, room.GetLength(1) - 2);
             }
             while (keyX == playerPositionX && keyY == playerPositionY);
 
 
             do      // Die Tür soll in einer der Wände und nicht in den 4 Eckpunkten platziert werden
             {
-                doorX = random.Next(roomWithY - 1);
-                doorY = random.Next(roomLengthX - 1);
+                doorX = random.Next(room.GetLength(0) - 1);
+                doorY = random.Next(room.GetLength(1) - 1);
             }
-            while (room[doorX, doorY] != wall || (doorX == 0 && doorY == 0) || (doorX == roomWithY && doorY == 0) ||
-                  (doorX == 0 && doorY == roomLengthX) || (doorX == roomWithY && doorY == roomLengthX));
+            while (room[doorX, doorY] != wall || (doorX == 0 && doorY == 0) || (doorX == room.GetLength(0) - 1 && doorY == 0) ||
+                  (doorX == 0 && doorY == room.GetLength(1) - 1) || (doorX == room.GetLength(0) - 1 && doorY == room.GetLength(1) - 1));
 
 
             // Platzierung der Tür, des Schlüssels und des Spielers im Room
@@ -189,13 +171,14 @@ namespace EscapeRoom
         // --- Bewegungsaktion des Players + Ausgabe des Rooms
         static void Move()
         {
+            string fieldGoto;
             bool validMovement;
             movement = true;
 
             // Der Room wird ausgegeben
-            for (int i = 0; i < roomLengthX; i++)
+            for (int i = 0; i < room.GetLength(0); i++)
             {
-                for (int j = 0; j < roomWithY; j++)             // !! i und j < room.length() ??
+                for (int j = 0; j < room.GetLength(1); j++)             // !! i und j < room.length() ??
                 {
                     Console.Write(" " + room[i, j]);    // Room wird in der Konsole gezeichnet
                 }
@@ -292,6 +275,7 @@ namespace EscapeRoom
                                       "Allerdings ist sie verschlossen.");
                 }
             }
+
         }
 
 
@@ -316,10 +300,6 @@ namespace EscapeRoom
                         // Alle relevanten Daten, die sich im Spielverlauf ändern, müssen zurückgesetzt werden
                         finished = false;
                         key = false;
-                        playerPositionX = 3;
-                        playerPositionY = 5;
-                        newPositionX = playerPositionX;
-                        newPositionY = playerPositionY;
                         fieldCamefrom = ".";
                         break;
 
