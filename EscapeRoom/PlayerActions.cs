@@ -49,11 +49,20 @@ namespace EscapeRoom
             {
                 for (int j = 0; j < room.GetLength(1); j++)             // !! i und j < room.length() ??
                 {
-                    Console.Write(" " + room[i, j]);    // Room wird in der Konsole gezeichnet
+                    // für die verschiedenen Elemente (Schlüssel, Tür, ...) werden verschiedene Farben verwendet
+                    if (room[i, j] == player) Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (room[i, j] == keyField) Console.ForegroundColor = ConsoleColor.Yellow;
+                    else if (room[i, j] == finishDoor && key) Console.ForegroundColor = ConsoleColor.Green;
+                    else if (room[i, j] == finishDoor && !key) Console.ForegroundColor = ConsoleColor.Red;
+                    else if (room[i, j] == wall) Console.ForegroundColor = ConsoleColor.White;
+                    else Console.ForegroundColor = ConsoleColor.DarkGray;
+                    
+                    Console.Write(" " + room[i, j]);
                 }
                 Console.WriteLine();
             }
             Console.WriteLine();
+            Console.ResetColor();
 
             Console.WriteLine("Wohin moechtest du dich bewegen? w = oben | a = links | s = unten | d = rechts \n");
 
