@@ -9,6 +9,8 @@ namespace EscapeRoom
 {
     public class PlayerActions
     {
+        AsciiSigns ascii = new AsciiSigns();
+
         private int playerPositionX, playerPositionY, newPositionX, newPositionY;
 
         private bool movement = true;        // darf sich der Player bewegen? (Wand etc.)
@@ -16,7 +18,7 @@ namespace EscapeRoom
         private bool key = false;   // hat der Player den Schlüssel?
 
         private string wall, field, player, finishDoor, keyField;
-        private string fieldCamefrom = ".";
+        private string fieldCamefrom;
 
         // Speichert die Symbole (werden vom RoomCreator erstellt)
         public void CopySymbols(String _wall, String _field, String _player, String _finishDoor, String _keyField)
@@ -26,6 +28,8 @@ namespace EscapeRoom
             player = _player;
             finishDoor = _finishDoor;
             keyField = _keyField;
+
+            fieldCamefrom = field;
         }
 
         public void SetPositions(int positionX, int positionY)
@@ -50,12 +54,12 @@ namespace EscapeRoom
                 for (int j = 0; j < room.GetLength(1); j++)             // !! i und j < room.length() ??
                 {
                     // für die verschiedenen Elemente (Schlüssel, Tür, ...) werden verschiedene Farben verwendet
-                    if (room[i, j] == player) Console.ForegroundColor = ConsoleColor.Cyan;
-                    else if (room[i, j] == keyField) Console.ForegroundColor = ConsoleColor.Yellow;
-                    else if (room[i, j] == finishDoor && key) Console.ForegroundColor = ConsoleColor.Green;
-                    else if (room[i, j] == finishDoor && !key) Console.ForegroundColor = ConsoleColor.Red;
-                    else if (room[i, j] == wall) Console.ForegroundColor = ConsoleColor.White;
-                    else Console.ForegroundColor = ConsoleColor.DarkGray;
+                    if      (room[i, j] == player)              Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (room[i, j] == keyField)            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    else if (room[i, j] == finishDoor && key)   Console.ForegroundColor = ConsoleColor.Green;
+                    else if (room[i, j] == finishDoor && !key)  Console.ForegroundColor = ConsoleColor.Red;
+                    else if (room[i, j] == wall)                Console.ForegroundColor = ConsoleColor.White;
+                    else                                        Console.ForegroundColor = ConsoleColor.DarkGray;
                     
                     Console.Write(" " + room[i, j]);
                 }
@@ -93,7 +97,9 @@ namespace EscapeRoom
                         break;
 
                     default:
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Diese Bewegung ist nicht moeglich, bitte druecke w/a/s/d");
+                        Console.ResetColor();
                         validMovement = false;
                         break;
                 }
@@ -134,13 +140,18 @@ namespace EscapeRoom
         {
             if (room[newPositionX, newPositionY] == wall)           // Wand
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("Du läufst gegen eine Wand *aua*");
+                Console.ResetColor();
                 movement = false;
             }
             if (room[newPositionX, newPositionY] == keyField)       // Schlüssel wurde gefunden
             {
+                Console.Beep();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Du hast einen Schlüssel gefunden. " +
                                   "Vielleicht findest du etwas, was du damit aufschliessen kannst...");
+                Console.ResetColor();
                 room[newPositionX, newPositionY] = ".";
                 key = true;
             }
@@ -148,10 +159,19 @@ namespace EscapeRoom
             {
                 if (key)
                 {
+                    Console.Beep();
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Vor dir befindet sich eine Tür, die nach draußen zu führen scheint. \n" +
                                       "Sie ist verschlossen, doch der Schlüssel, den du gefunden hast, scheint zu passen. \n" +
-                                      "So gelingt es dir, die Tür aufzuschliessen und zu entkommen! \n \n" +
-                                      "Drücke eine beliebige Taste, um ins Menü zurück zu kehren. \n");
+                                      "So gelingt es dir, die Tür aufzuschliessen und zu entkommen! \n");
+                    Console.ResetColor();
+                    Console.ReadKey();
+                    Console.Clear();
+
+                    Console.WriteLine(ascii.endSign);
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("Drücke eine beliebige Taste, um ins Menü zurück zu kehren. \n");
+                    Console.ResetColor();
                     Console.ReadKey();
                     Console.Clear();
 
@@ -159,8 +179,12 @@ namespace EscapeRoom
                 }
                 else
                 {
+                    Console.Beep();
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Vor dir befindet sich eine Tür, die nach draußen zu führen scheint. " +
                                       "Allerdings ist sie verschlossen.");
+                    Console.ResetColor();
+                    movement = false;
                 }
             }
         }

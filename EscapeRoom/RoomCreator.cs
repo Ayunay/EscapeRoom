@@ -9,6 +9,8 @@ namespace EscapeRoom
 {
     public class RoomCreator
     {
+        AsciiSigns ascii = new AsciiSigns();
+
         public string wall, field, player, finishDoor, keyField;
 
         public string[,] room;
@@ -20,10 +22,10 @@ namespace EscapeRoom
         public void SetSymbols()
         {
             wall = "■";
-            field = ".";
-            player = "ß";
+            field = "·";
+            player = "☺";
             finishDoor = "#";
-            keyField = "?";
+            keyField = "F";
         }
 
         // Der Spieler soll angeben, wie groß der Room sein soll
@@ -32,6 +34,7 @@ namespace EscapeRoom
             int roomLengthX = 0, roomWithY = 0;
             bool validLengthX = false, validLengthY = false;
 
+            Console.WriteLine(ascii.roomCreatorSign);
             Console.WriteLine("Wähle nun die Größe deines Spielfeldes. \n" +
                               "Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen 5 und 15");
 
@@ -41,7 +44,9 @@ namespace EscapeRoom
 
                 if (!int.TryParse(roomWithYinput, out roomWithY))   // Prüft, ob die Eingabe gültig war / eine Zahl ist
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Bitte gib eine Zahl ein");
+                    Console.ResetColor();
                 }
                 else
                 {
@@ -53,15 +58,21 @@ namespace EscapeRoom
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Dieser Wert liegt nicht in dem vorgegebenen Bereich.");
+                        Console.ResetColor();
                     }
                 }
             }
 
             Console.Clear();
 
-            Console.WriteLine("Breite: " + roomWithY + "\n\n" +
-                              "Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 5 und 20");
+            Console.WriteLine(ascii.roomCreatorSign);
+
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("Breite: " + roomWithY + "\n");
+            Console.ResetColor();
+            Console.WriteLine("Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 5 und 20");
 
             while (!validLengthX)   // nun soll der X-Wert festgelegt werden, in der gleichen Weise wie beim Y-Wert oben
             {
@@ -70,7 +81,9 @@ namespace EscapeRoom
 
                 if (!int.TryParse(roomLengthXinput, out roomLengthX))   // Prüft, ob die EIngabe gültig war / eine Zahl ist
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Bitte gib eine Zahl ein");
+                    Console.ResetColor();
                 }
                 else
                 {
@@ -82,7 +95,9 @@ namespace EscapeRoom
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Dieser Wert liegt nicht in dem vorgegebenen Bereich.");
+                        Console.ResetColor();
                     }
                 }
             }
@@ -90,8 +105,13 @@ namespace EscapeRoom
             room = new string[roomLengthX, roomWithY];
 
             Console.Clear();
-            Console.WriteLine($"Breite: {roomWithY} \nLänge: {roomLengthX} \n" +
-                              "Drücke nun eine beliebige Taste, um das Spiel zu beginnen");
+            Console.WriteLine(ascii.roomCreatorSign);
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine($"Breite: {roomWithY} \nLänge: {roomLengthX} \n");
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("Drücke nun eine beliebige Taste, um das Spiel zu beginnen");
+            Console.ResetColor();
             Console.ReadKey();
         }
 
@@ -117,15 +137,24 @@ namespace EscapeRoom
             }
 
 
-            do      // die Schleife stellt sicher, dass der Schlüssel und der Spieler nicht auf dem selben Feld spawnen
+            do      // der Schlüssel soll auf einem freien Feld im Raum platziert werden
             {
-                keyX = random.Next(1, room.GetLength(0) - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels...
-                keyY = random.Next(1, room.GetLength(1) - 2);
+                keyX = random.Next(1, room.GetLength(0) - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels
+                keyY = random.Next(1, room.GetLength(1) - 2);       // innerhalb der äußeren Wände
+            }
+            while (room[keyX, keyY] == wall);                       // und nicht auf einer Wand (innere Wände)
 
-                playerPositionX = random.Next(1, room.GetLength(0) - 2);    // ... und für die Startposition des Spielers
+            room[keyX, keyY] = keyField;                            // endgültige Platzierung im Array
+
+
+            do      // die Schleife stellt sicher, dass der Spieler nicht auf dem Feld des Schlüssels oder in einer Wand spawnt 
+            {
+                playerPositionX = random.Next(1, room.GetLength(0) - 2);
                 playerPositionY = random.Next(1, room.GetLength(1) - 2);
             }
-            while (keyX == playerPositionX && keyY == playerPositionY);
+            while (room[playerPositionX, playerPositionY] == keyField || room[playerPositionX, playerPositionY] == wall);
+
+            room[playerPositionX, playerPositionY] = player;
 
 
             do      // Die Tür soll in einer der Wände und nicht in den 4 Eckpunkten platziert werden
@@ -136,11 +165,8 @@ namespace EscapeRoom
             while (room[doorX, doorY] != wall || (doorX == 0 && doorY == 0) || (doorX == room.GetLength(0) - 1 && doorY == 0) ||
                   (doorX == 0 && doorY == room.GetLength(1) - 1) || (doorX == room.GetLength(0) - 1 && doorY == room.GetLength(1) - 1));
 
-
-            // Platzierung der Tür, des Schlüssels und des Spielers im Room
             room[doorX, doorY] = finishDoor;
-            room[keyX, keyY] = keyField;
-            room[playerPositionX, playerPositionY] = player;
+
 
             return room;
         }
