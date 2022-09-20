@@ -51,60 +51,65 @@ namespace EscapeRoom
             // Der Room wird ausgegeben
             for (int i = 0; i < room.GetLength(0); i++)
             {
-                for (int j = 0; j < room.GetLength(1); j++)             // !! i und j < room.length() ??
+                for (int j = 0; j < room.GetLength(1); j++)
                 {
+                    string activeField = room[i, j];
+
                     // für die verschiedenen Elemente (Schlüssel, Tür, ...) werden verschiedene Farben verwendet
-                    if      (room[i, j] == player)              Console.ForegroundColor = ConsoleColor.Cyan;
-                    else if (room[i, j] == keyField)            Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    else if (room[i, j] == finishDoor && key)   Console.ForegroundColor = ConsoleColor.Green;
-                    else if (room[i, j] == finishDoor && !key)  Console.ForegroundColor = ConsoleColor.Red;
-                    else if (room[i, j] == wall)                Console.ForegroundColor = ConsoleColor.White;
-                    else                                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    if      (activeField == player)              Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (activeField == keyField)            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    else if (activeField == finishDoor && key)   Console.ForegroundColor = ConsoleColor.Green;
+                    else if (activeField == finishDoor && !key)  Console.ForegroundColor = ConsoleColor.Red;
+                    else if (activeField == wall)                Console.ForegroundColor = ConsoleColor.White;
+                    else                                         Console.ForegroundColor = ConsoleColor.DarkGray;
                     
-                    Console.Write(" " + room[i, j]);
+                    Console.Write(" " + activeField);
                 }
                 Console.WriteLine();
             }
             Console.WriteLine();
             Console.ResetColor();
 
-            Console.WriteLine("Wohin moechtest du dich bewegen? w = oben | a = links | s = unten | d = rechts \n");
+            Console.WriteLine("Wohin moechtest du dich bewegen? \n" +
+                              " ► Benutze für die Bewegung w/a/s/d oder die Pfeiltasten. \n");
+            Console.CursorVisible = false;
 
             do  // Auswertung der Eingabe für die Bewegungsrichtung
             {
-                char moveDirection = Console.ReadKey(true).KeyChar;     // Eingabe der Bewegunsrichtung vom Player
+                ConsoleKeyInfo button = Console.ReadKey();      // Eingabe der Bewegunsrichtung vom Player
 
-                switch (moveDirection)  // Eingabeauswertung der Bewegungsrichtung
+                switch (button.Key)  // Eingabeauswertung der Bewegungsrichtung
                 {
-                    case 'w':
-                        newPositionX = playerPositionX - 1;
-                        validMovement = true;
+                    case ConsoleKey.UpArrow or ConsoleKey.W:    // wenn Pfeiltaste nach oben oder W gedrückt wird
+                        newPositionX = playerPositionX - 1;     // wird gespeichert, dass der Spieler nach oben laufen soll
+                        validMovement = true;                   // und es war eine gültige Bewegungseingabe
                         break;
 
-                    case 's':
+                    case ConsoleKey.DownArrow or ConsoleKey.S:
                         newPositionX = playerPositionX + 1;
                         validMovement = true;
                         break;
 
-                    case 'a':
+                    case ConsoleKey.LeftArrow or ConsoleKey.A:
                         newPositionY = playerPositionY - 1;
                         validMovement = true;
                         break;
 
-                    case 'd':
+                    case ConsoleKey.RightArrow or ConsoleKey.D:
                         newPositionY = playerPositionY + 1;
                         validMovement = true;
                         break;
 
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Diese Bewegung ist nicht moeglich, bitte druecke w/a/s/d");
+                        Console.WriteLine(" ist nicht möglich zum bewegen, bitte befolge die obenstehenden Anweisungen.");
                         Console.ResetColor();
                         validMovement = false;
                         break;
                 }
             }
-            while (!validMovement); // Eingabe wird wiederholt, wenn die Eingabe ungueltig war
+            while (!validMovement); // Eingabe wird wiederholt, wenn die Eingabe ungültig war
+            Console.CursorVisible = true;
 
             Console.Clear();
             Event(room);
@@ -138,6 +143,7 @@ namespace EscapeRoom
         // --- Events: wenn der Player auf/gegen ein spezielles Feld läuft
         public void Event(String[,] room)
         {
+            Console.CursorVisible = false;
             if (room[newPositionX, newPositionY] == wall)           // Wand
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -187,6 +193,7 @@ namespace EscapeRoom
                     movement = false;
                 }
             }
+            Console.CursorVisible = true;
         }
 
     }
