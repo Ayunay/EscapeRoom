@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,12 +12,11 @@ namespace EscapeRoom
     {
         AsciiSigns ascii = new AsciiSigns();
         public bool closeGame = false;
-        private string wall, field, player, finishDoor, keyField;
+        private string player, finishDoor, keyField;
 
-        public void CopySymbols(String _wall, String _field, String _player, String _finishDoor, String _keyField)
+        public void CopySymbols(string _player, string _finishDoor, string _keyField)
         {
-            wall = _wall;
-            field = _field;
+            
             player = _player;
             finishDoor = _finishDoor;
             keyField = _keyField;
@@ -31,7 +31,7 @@ namespace EscapeRoom
             {
                 Console.WriteLine(ascii.menuSign);
                 Console.WriteLine("\nWas möchtest du tun? \n" +
-                                  "1. Escape Room neu beginnen \n" +
+                                  "1. Escape Room (neu) beginnen \n" +
                                   "2. Spiel beenden \n");
 
                 char menuSelection = Console.ReadKey(true).KeyChar;   // Eingabe von Player + Auswertung unten
@@ -46,7 +46,7 @@ namespace EscapeRoom
 
                     case '2':
                         validMenuselection = true;
-                        closeGame = true;
+                        Environment.Exit(0);
                         break;
 
                     default:
@@ -61,6 +61,51 @@ namespace EscapeRoom
                         break;
                 }
             }
+        }
+
+        public bool PauseScreen()
+        {
+            bool validPauseselection = false;
+            bool stopGame = false;
+
+            while (!validPauseselection)
+            {
+                Console.Clear();
+                Console.WriteLine(ascii.pauseSign);
+                Console.WriteLine("\nWas möchtest du tun? \n" +
+                                  "1. Spiel fortfahren \n" +
+                                  "2. Zurück zum Hauptmenü \n");
+
+                char pauseSelection = Console.ReadKey(true).KeyChar;   // Eingabe von Player + Auswertung unten
+
+                switch (pauseSelection)
+                {
+                    case '1':
+                        validPauseselection = true;
+                        stopGame = false;
+                        Console.WriteLine("You can now move again");
+                        break;
+
+                    case '2':
+                        validPauseselection = true;
+                        stopGame = true;
+                        //Environment.Exit(0);
+                        break;
+
+                    default:
+                        Console.Clear();
+                        Console.WriteLine(ascii.errorSign);
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine($"Du hast > {pauseSelection} < eingegeben. \n" +
+                                           "Dies ist eine ungültige Angabe, bitte wähle zwischen den angegebenen Punkten \n");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                }
+            }
+
+            return stopGame;
         }
 
         public void GameExplanation()

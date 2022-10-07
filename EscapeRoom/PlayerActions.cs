@@ -10,18 +10,19 @@ namespace EscapeRoom
     public class PlayerActions
     {
         AsciiSigns ascii = new AsciiSigns();
+        Menu Menu = new Menu();
 
         private int playerPositionX, playerPositionY, newPositionX, newPositionY;
 
-        private bool movement = true;        // darf sich der Player bewegen? (Wand etc.)
+        private bool movement = true;       // darf sich der Player bewegen? (Wand etc.)
         private bool finished = false;
-        private bool key = false;   // hat der Player den Schlüssel?
+        private bool key = false;           // hat der Player den Schlüssel?
 
         private string wall, field, player, finishDoor, keyField;
         private string fieldCamefrom;
 
         // Speichert die Symbole (werden vom RoomCreator erstellt)
-        public void CopySymbols(String _wall, String _field, String _player, String _finishDoor, String _keyField)
+        public void CopySymbols(string _wall, string _field, string _player, string _finishDoor, string _keyField)
         {
             wall = _wall;
             field = _field;
@@ -100,6 +101,16 @@ namespace EscapeRoom
                         validMovement = true;
                         break;
 
+                    case ConsoleKey.Escape:
+                        finished = Menu.PauseScreen();
+                        validMovement = true;
+                        movement = false;
+                        break;
+
+                    case ConsoleKey.Spacebar:
+                        validMovement = false;
+                        break;
+
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(" ist nicht möglich zum bewegen, bitte befolge die obenstehenden Anweisungen.");
@@ -149,15 +160,20 @@ namespace EscapeRoom
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("Du läufst gegen eine Wand *aua*");
                 Console.ResetColor();
+
                 movement = false;
             }
             if (room[newPositionX, newPositionY] == keyField)       // Schlüssel wurde gefunden
             {
+                Console.Clear();
                 Console.Beep();
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Du hast einen Schlüssel gefunden. " +
                                   "Vielleicht findest du etwas, was du damit aufschliessen kannst...");
                 Console.ResetColor();
+                Console.ReadKey();
+                Console.Clear();
+
                 room[newPositionX, newPositionY] = ".";
                 key = true;
             }
@@ -165,6 +181,7 @@ namespace EscapeRoom
             {
                 if (key)
                 {
+                    Console.Clear();
                     Console.Beep();
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Vor dir befindet sich eine Tür, die nach draußen zu führen scheint. \n" +
@@ -185,11 +202,15 @@ namespace EscapeRoom
                 }
                 else
                 {
+                    Console.Clear();
                     Console.Beep();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Vor dir befindet sich eine Tür, die nach draußen zu führen scheint. " +
                                       "Allerdings ist sie verschlossen.");
                     Console.ResetColor();
+                    Console.ReadKey();
+                    Console.Clear();
+
                     movement = false;
                 }
             }
