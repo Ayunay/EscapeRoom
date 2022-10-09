@@ -18,16 +18,17 @@ namespace EscapeRoom
         private bool finished = false;
         private bool key = false;           // hat der Player den Schlüssel?
 
-        private string wall, field, player, finishDoor, keyField;
+        private string wall, field, player, finishDoor, midDoor, keyField;
         private string fieldCamefrom;
 
         // Speichert die Symbole (werden vom RoomCreator erstellt)
-        public void CopySymbols(string _wall, string _field, string _player, string _finishDoor, string _keyField)
+        public void CopySymbols(string _wall, string _field, string _player, string _finishDoor, string _midDoor, string _keyField)
         {
             wall = _wall;
             field = _field;
             player = _player;
             finishDoor = _finishDoor;
+            midDoor = _midDoor;
             keyField = _keyField;
 
             fieldCamefrom = field;
@@ -152,7 +153,7 @@ namespace EscapeRoom
 
 
         // --- Events: wenn der Player auf/gegen ein spezielles Feld läuft
-        public void Event(String[,] room)
+        public void Event(string[,] room)
         {
             Console.CursorVisible = false;
             if (room[newPositionX, newPositionY] == wall)           // Wand

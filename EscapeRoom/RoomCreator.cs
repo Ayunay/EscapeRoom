@@ -11,13 +11,16 @@ namespace EscapeRoom
     {
         AsciiSigns ascii = new AsciiSigns();
 
-        public string wall, field, player, finishDoor, keyField;
+        public string wall, field, player, finishDoor, midDoor, keyField;
 
         public string[,] room;
-        private int hight = 4;
-        private int with = 8;
 
         public int playerPositionX, playerPositionY;
+
+        public int lengthMin = 5;
+        public int lengthMax = 25;
+        public int widthMin = 5;
+        public int widthMax = 30;
 
         public void SetSymbols()
         {
@@ -25,6 +28,7 @@ namespace EscapeRoom
             field = "·";
             player = "☺";
             finishDoor = "#";
+            midDoor = "·";
             keyField = "F";
         }
 
@@ -36,7 +40,7 @@ namespace EscapeRoom
 
             Console.WriteLine(ascii.roomCreatorSign);
             Console.WriteLine("Wähle nun die Größe deines Spielfeldes. \n" +
-                              "Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen 5 und 15");
+                             $"Welche Breite (nach rechts) soll dein Feld haben? Wähle zwischen {widthMin} und {widthMax}.");
 
             while (!validLengthY)   // zuerst soll der Y-Wert festgelegt werden
             {
@@ -52,7 +56,7 @@ namespace EscapeRoom
                 {
                     roomWithY = int.Parse(roomWithYinput);          // wandelt die eingegebene Zahl als string in int um
 
-                    if (roomWithY >= 5 && roomWithY <= 15)          // Prüft, ob die eingegebene Zahl im Bereich liegt
+                    if (roomWithY >= widthMin && roomWithY <= widthMax)          // Prüft, ob die eingegebene Zahl im Bereich liegt
                     {
                         validLengthY = true;
                     }
@@ -72,7 +76,7 @@ namespace EscapeRoom
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("Breite: " + roomWithY + "\n");
             Console.ResetColor();
-            Console.WriteLine("Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen 5 und 20");
+            Console.WriteLine($"Welche Länge (nach unten) soll dein Feld haben? Wähle zwischen {lengthMin} und {lengthMax}.");
 
             while (!validLengthX)   // nun soll der X-Wert festgelegt werden, in der gleichen Weise wie beim Y-Wert oben
             {
@@ -89,7 +93,7 @@ namespace EscapeRoom
                 {
                     roomLengthX = int.Parse(roomLengthXinput);          // wandelt die eingegebene Zahl in int um
 
-                    if (roomLengthX >= 5 && roomLengthX <= 20)          // Prüft, ob die eingegebene Zahl im Bereich liegt    
+                    if (roomLengthX >= lengthMin && roomLengthX <= lengthMax)          // Prüft, ob die eingegebene Zahl im Bereich liegt    
                     {
                         validLengthX = true;
                     }
@@ -120,7 +124,7 @@ namespace EscapeRoom
         public string[,] CreateChosenRoom()
         {
             Random random = new Random();
-            int keyX, keyY, doorX, doorY;
+            int keyX, keyY, doorX, doorY, midWallX, midWallY;
 
             // Initialisierung des Rooms 
             for (int i = 0; i < room.GetLength(0); i++)
@@ -137,26 +141,6 @@ namespace EscapeRoom
             }
 
 
-            do      // der Schlüssel soll auf einem freien Feld im Raum platziert werden
-            {
-                keyX = random.Next(1, room.GetLength(0) - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels
-                keyY = random.Next(1, room.GetLength(1) - 2);       // innerhalb der äußeren Wände
-            }
-            while (room[keyX, keyY] == wall);                       // und nicht auf einer Wand (innere Wände)
-
-            room[keyX, keyY] = keyField;                            // endgültige Platzierung im Array
-
-
-            do      // die Schleife stellt sicher, dass der Spieler nicht auf dem Feld des Schlüssels oder in einer Wand spawnt 
-            {
-                playerPositionX = random.Next(1, room.GetLength(0) - 2);
-                playerPositionY = random.Next(1, room.GetLength(1) - 2);
-            }
-            while (room[playerPositionX, playerPositionY] == keyField || room[playerPositionX, playerPositionY] == wall);
-
-            room[playerPositionX, playerPositionY] = player;
-
-
             do      // Die Tür soll in einer der Wände und nicht in den 4 Eckpunkten platziert werden
             {
                 doorX = random.Next(room.GetLength(0) - 1);
@@ -167,6 +151,113 @@ namespace EscapeRoom
 
             room[doorX, doorY] = finishDoor;
 
+
+            CreateMidWalls(room);   // ein großer Raum soll in mehrere Kleine gespalten werden, mithilfe von mittleren Wänden
+
+
+            do      // der Schlüssel soll auf einem freien Feld im Raum platziert werden
+            {
+                keyX = random.Next(1, room.GetLength(0) - 2);       // erstellt Zufallszahlen für die Positionen des Schlüssels
+                keyY = random.Next(1, room.GetLength(1) - 2);       // innerhalb der äußeren Wände
+            }
+            while (room[keyX, keyY] == wall);                       // und nicht auf einer Wand (innere Wände)
+
+            room[keyX, keyY] = keyField;
+
+
+            do      // die Schleife stellt sicher, dass der Spieler nicht auf dem Feld des Schlüssels oder in einer Wand spawnt 
+            {
+                playerPositionX = random.Next(1, room.GetLength(0) - 2);
+                playerPositionY = random.Next(1, room.GetLength(1) - 2);
+            }
+            while (room[playerPositionX, playerPositionY] == keyField || room[playerPositionX, playerPositionY] == wall || 
+                   room[playerPositionX, playerPositionY] == midDoor); // er soll auch nicht in einer offenen Tür spawnen
+
+            room[playerPositionX, playerPositionY] = player;
+
+
+            return room;
+        }
+
+        public string[,] CreateMidWalls(string[,] room)
+        {
+            Random random = new Random();
+
+            int midWallX = 1, midWallY = 1;
+            int midDoorX, midDoorY;
+
+            bool midWallUp = false, midWallSide = false;
+
+
+            if (room.GetLength(0) >= 9)     // Erstellt vertikale Wand, wenn der Raum mind. 9 bzw 7 Felder hoch ist
+            {
+                do
+                {
+                    midWallX = random.Next(3, room.GetLength(0) - 4);
+                }
+                while (room[midWallX, 0] == finishDoor || room[midWallX, room.GetLength(1) - 1] == finishDoor);
+                // die Wand darf nicht die Ausgangstür versperren bzw überschreiben
+
+                for (int y = 1; y < room.GetLength(1); y++)
+                {
+                    room[midWallX, y] = wall;
+                }
+
+                midWallUp = true; 
+            }
+
+            if (room.GetLength(1) >= 9)     // Erstellt horizontale Wand, wenn der Raum mind. 9 bzw 7 Felder breit ist
+            {
+                do      // mitten durch den Raum soll noch eine Wand gezogen werden
+                {
+                    midWallY = random.Next(3, room.GetLength(1) - 4);
+                }
+                while (room[0, midWallY] == finishDoor || room[room.GetLength(0) - 1, midWallY] == finishDoor);
+                //die Wand darf nicht die Ausgangstür versperren bzw überschreiben
+
+                for (int x = 1; x < room.GetLength(0); x++)
+                {
+                    room[x, midWallY] = wall;
+                }
+
+                midWallSide = true; 
+            }
+
+
+            if (midWallUp && midWallSide)
+            {
+                // erstellt zwei Türen in der vertikalen Wand (midWallX)
+                midDoorX = midWallX;
+                midDoorY = random.Next(1, midWallY - 1);    // eine Tür oberhalb von midWallY
+                room[midDoorX, midDoorY] = midDoor;
+
+                midDoorY = random.Next(midWallY + 1, room.GetLength(1) - 2);    // eine unterhalb midWallY
+                room[midDoorX, midDoorY] = midDoor;
+
+                // erstellt zwei Türen in der horizontalen Wand (midWallY)
+                midDoorY = midWallY;
+                midDoorX = random.Next(1, midWallX - 1);   // eine Tür links von midWallX
+                room[midDoorX, midDoorY] = midDoor;
+
+                midDoorX = random.Next(midWallX + 1, room.GetLength(0) - 2);   // eine rechts von midWallX
+                room[midDoorX, midDoorY] = midDoor;
+            }
+
+            else if(midWallUp)      // erstellt eine Tür in der vertikalen Wand
+            {
+                midDoorX = midWallX;
+                midDoorY = random.Next(1, room.GetLength(1) - 2);
+
+                room[midDoorX, midDoorY] = midDoor;
+            }
+
+            else if(midWallSide)    // erstellt eine Tür in der horizontalen Wand
+            {
+                midDoorX = random.Next(1, room.GetLength(0) - 2);
+                midDoorY = midWallY;
+
+                room[midDoorX, midDoorY] = midDoor;
+            }
 
             return room;
         }

@@ -14,7 +14,7 @@ namespace EscapeRoom
             string[,] room;
 
             PlayField.SetSymbols();             // Speichert die Symbole ... und setzt sie in PlayerActions ein
-            Player.CopySymbols(PlayField.wall, PlayField.field, PlayField.player, PlayField.finishDoor, PlayField.keyField);
+            Player.CopySymbols(PlayField.wall, PlayField.field, PlayField.player, PlayField.finishDoor, PlayField.midDoor, PlayField.keyField);
             Menu.CopySymbols(PlayField.player, PlayField.finishDoor, PlayField.keyField);
 
             // Beginn des Programmes bzw. Start des Menüs
