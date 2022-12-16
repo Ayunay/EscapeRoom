@@ -124,7 +124,7 @@ namespace EscapeRoom
         public string[,] CreateChosenRoom()
         {
             Random random = new Random();
-            int keyX, keyY, doorX, doorY, midWallX, midWallY;
+            int keyX, keyY, doorX, doorY;
 
             // Initialisierung des Rooms 
             for (int i = 0; i < room.GetLength(0); i++)
@@ -170,8 +170,7 @@ namespace EscapeRoom
                 playerPositionX = random.Next(1, room.GetLength(0) - 2);
                 playerPositionY = random.Next(1, room.GetLength(1) - 2);
             }
-            while (room[playerPositionX, playerPositionY] == keyField || room[playerPositionX, playerPositionY] == wall || 
-                   room[playerPositionX, playerPositionY] == midDoor); // er soll auch nicht in einer offenen Tür spawnen
+            while (room[playerPositionX, playerPositionY] != field);    // er soll auch nicht in einer offenen Tür spawnen
 
             room[playerPositionX, playerPositionY] = player;
 
@@ -223,6 +222,7 @@ namespace EscapeRoom
                 midWallSide = true; 
             }
 
+            // Tür soll in der/den neu erstellten Wand/Wänden generiert werden
 
             if (midWallUp && midWallSide)
             {

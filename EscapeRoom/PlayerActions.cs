@@ -73,12 +73,13 @@ namespace EscapeRoom
             Console.ResetColor();
 
             Console.WriteLine("Wohin moechtest du dich bewegen? \n" +
-                              " ► Benutze für die Bewegung w/a/s/d oder die Pfeiltasten. \n");
+                              " ► Benutze für die Bewegung w/a/s/d oder die Pfeiltasten. \n" +
+                              " ► Drücke <Esc> um ins Pausenmenü zu gelangen. \n");
             Console.CursorVisible = false;
 
             do  // Auswertung der Eingabe für die Bewegungsrichtung
             {
-                ConsoleKeyInfo button = Console.ReadKey();      // Eingabe der Bewegunsrichtung vom Player
+                ConsoleKeyInfo button = Console.ReadKey(true);      // Eingabe der Bewegunsrichtung vom Player
 
                 switch (button.Key)  // Eingabeauswertung der Bewegungsrichtung
                 {
@@ -107,11 +108,11 @@ namespace EscapeRoom
                         validMovement = true;
                         movement = false;
                         break;
-
-                    case ConsoleKey.Spacebar:
+                        
+                    case ConsoleKey.Spacebar:   // Musste ich einbauen, weil sich der raum bei der Taste immer verschiebt
                         validMovement = false;
                         break;
-
+                        
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(" ist nicht möglich zum bewegen, bitte befolge die obenstehenden Anweisungen.");

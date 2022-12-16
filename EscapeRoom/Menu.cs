@@ -23,8 +23,9 @@ namespace EscapeRoom
         }
 
         // --- Menüauswahl
-        public void MenuSelector()
+        public bool MenuSelector()
         {
+            bool gameFlow = true;
             bool validMenuselection = false;
 
             while (!validMenuselection)
@@ -42,10 +43,12 @@ namespace EscapeRoom
                 {
                     case '1':
                         validMenuselection = true;
+                        gameFlow = true;
                         break;
 
                     case '2':
                         validMenuselection = true;
+                        gameFlow = false;
                         Environment.Exit(0);
                         break;
 
@@ -61,6 +64,8 @@ namespace EscapeRoom
                         break;
                 }
             }
+
+            return gameFlow;
         }
 
         public bool PauseScreen()
@@ -147,8 +152,6 @@ namespace EscapeRoom
         public void GameStart()
         {
             Console.WriteLine(ascii.startSign);
-            Console.ReadKey();
-            Console.Clear();
 
             // Aktuelle Situation
             Console.ForegroundColor = ConsoleColor.Blue;
