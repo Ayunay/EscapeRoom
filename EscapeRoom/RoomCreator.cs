@@ -26,7 +26,7 @@ namespace EscapeRoom
         {
             wall = "■";
             field = "·";
-            player = "☺";
+            player = "P";
             finishDoor = "#";
             midDoor = "·";
             keyField = "F";

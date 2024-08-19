@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EscapeRoom")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b9268e732b834a7ef445323e84d18da4bad9a28b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf6e72b5d606fd3fa29953fc2b08194d5e6096a3")]
 [assembly: System.Reflection.AssemblyProductAttribute("EscapeRoom")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EscapeRoom")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
